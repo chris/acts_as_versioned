@@ -35,6 +35,27 @@ class VersionedTest < Test::Unit::TestCase
     assert p.revert_to!(23), "Couldn't revert to 23"
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
+    
+    p.reload
+    assert_equal 2, p.versions.length
+  end
+  
+  def test_rollback_with_version_number_and_remove_newer_versions
+    p = pages(:welcome)
+    assert_equal 24, p.version
+    assert_equal 'Welcome to the weblog', p.title
+
+    p.update_attribute(:title, 'Welcome to the blog')
+    assert_equal 'Welcome to the blog', p.title
+    assert_equal 25, p.version
+    assert_equal 3, p.versions.length
+    
+    assert p.revert_to!(23, true), "Couldn't revert to 23"
+    assert_equal 23, p.version
+    assert_equal 'Welcome to the weblg', p.title
+  
+    p.reload
+    assert_equal 1, p.versions.length
   end
 
   def test_versioned_class_name
@@ -62,6 +83,27 @@ class VersionedTest < Test::Unit::TestCase
     assert p.revert_to!(p.versions.find_by_version(23)), "Couldn't revert to 23"
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
+    
+    p.reload
+    assert_equal 2, p.versions.length
+  end
+
+  def test_rollback_with_version_class_and_remove_newer_versions
+    p = pages(:welcome)
+    assert_equal 24, p.version
+    assert_equal 'Welcome to the weblog', p.title
+
+    p.update_attribute(:title, 'Welcome to the blog')
+    assert_equal 'Welcome to the blog', p.title
+    assert_equal 25, p.version
+    assert_equal 3, p.versions.length
+
+    assert p.revert_to!(p.versions.find_by_version(23), true), "Couldn't revert to 23"
+    assert_equal 23, p.version
+    assert_equal 'Welcome to the weblg', p.title
+    
+    p.reload
+    assert_equal 1, p.versions.length
   end
 
   def test_rollback_fails_with_invalid_revision

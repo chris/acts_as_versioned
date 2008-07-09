@@ -291,6 +291,11 @@ module ActiveRecord #:nodoc:
             self.class.versioned_class.delete_all ["version <= ? and #{self.class.versioned_foreign_key} = ?", excess_baggage, id]
           end
         end
+        
+        # Remove any versions that are newer than the current version
+        def delete_newer_versions
+          self.class.versioned_class.delete_all ["version > ? AND #{self.class.versioned_foreign_key} = ?", version, id]
+        end
 
         # Reverts a model to a given version.  Takes either a version number or an instance of the versioned model
         def revert_to(version)
@@ -306,8 +311,12 @@ module ActiveRecord #:nodoc:
 
         # Reverts a model to a given version and saves the model.
         # Takes either a version number or an instance of the versioned model
-        def revert_to!(version)
-          revert_to(version) ? save_without_revision : false
+        # Optionally takes parameter to indicate whether all newer versions
+        # (after the version being reverted to) should be deleted.
+        def revert_to!(version, remove_newer_versions = false)
+          result = revert_to(version) ? save_without_revision : false
+          delete_newer_versions if (result && remove_newer_versions)
+          result
         end
 
         # Temporarily turns off Optimistic Locking while saving.  Used when reverting so that a new version is not created.
