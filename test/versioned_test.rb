@@ -36,7 +36,6 @@ class VersionedTest < Test::Unit::TestCase
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
     
-    p.reload
     assert_equal 2, p.versions.length
   end
   
@@ -54,7 +53,6 @@ class VersionedTest < Test::Unit::TestCase
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
   
-    p.reload
     assert_equal 1, p.versions.length
   end
 
@@ -84,7 +82,6 @@ class VersionedTest < Test::Unit::TestCase
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
     
-    p.reload
     assert_equal 2, p.versions.length
   end
 
@@ -102,7 +99,6 @@ class VersionedTest < Test::Unit::TestCase
     assert_equal 23, p.version
     assert_equal 'Welcome to the weblg', p.title
     
-    p.reload
     assert_equal 1, p.versions.length
   end
 

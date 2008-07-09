@@ -295,6 +295,8 @@ module ActiveRecord #:nodoc:
         # Remove any versions that are newer than the current version
         def delete_newer_versions
           self.class.versioned_class.delete_all ["version > ? AND #{self.class.versioned_foreign_key} = ?", version, id]
+          # reload the association so it's accurate after the delete
+          self.versions(true)
         end
 
         # Reverts a model to a given version.  Takes either a version number or an instance of the versioned model
