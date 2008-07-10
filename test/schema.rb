@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :updated_on, :datetime
     t.column :author_id, :integer
     t.column :revisor_id, :integer
+    t.column :updated_attributes, :text
   end
   
   add_index :page_versions, [:page_id, :version], :unique => true
@@ -37,6 +38,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :title, :string, :limit => 255
     t.column :version_type, :string, :limit => 255
     t.column :updated_at, :datetime
+    t.column :updated_attributes, :text
   end
   
   add_index :locked_pages_revisions, [:page_id, :version], :unique => true
@@ -53,6 +55,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :name, :string, :limit => 50
     t.column :version, :integer
     t.column :updated_at, :datetime
+    t.column :updated_attributes, :text
   end
   
   add_index :widget_versions, [:widget_id, :version], :unique => true
@@ -72,6 +75,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.column :longitude, :float
     t.column :doesnt_trigger_version,:string
     t.column :version, :integer
+    t.column :updated_attributes, :text
   end
   
   add_index :landmark_versions, [:landmark_id, :version], :unique => true

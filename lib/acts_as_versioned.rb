@@ -222,12 +222,14 @@ module ActiveRecord #:nodoc:
               options[:if_changed] = [options[:if_changed]] unless options[:if_changed].is_a?(Array)
               self.version_if_changed = options[:if_changed]
             end
-
+            
             include options[:extend] if options[:extend].is_a?(Module)
           end
 
           # create the dynamic versioned model
           const_set(versioned_class_name, Class.new(ActiveRecord::Base)).class_eval do
+            serialize :updated_attributes, Array
+            
             def self.reloadable? ; false ; end
             # find first version before the given version
             def self.before(version)
@@ -278,6 +280,16 @@ module ActiveRecord #:nodoc:
             clone_versioned_model(self, rev)
             rev.version = send(self.class.version_column)
             rev.send("#{self.class.versioned_foreign_key}=", id)
+            
+            # save off which attributes were changed for this version, unless first version
+            if rev.version > 1
+              rev.updated_attributes = changed
+              # remove any non-versioned columns
+              rev.updated_attributes.delete_if { |attr| self.non_versioned_columns.include?(attr) }
+            else
+              rev.updated_attributes = []
+            end
+            
             rev.save
           end
         end
@@ -427,6 +439,7 @@ module ActiveRecord #:nodoc:
             self.connection.create_table(versioned_table_name, create_table_options) do |t|
               t.column versioned_foreign_key, :integer
               t.column :version, :integer
+              t.column :updated_attributes, :text
             end
 
             updated_col = nil

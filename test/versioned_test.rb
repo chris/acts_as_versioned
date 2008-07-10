@@ -380,4 +380,15 @@ class VersionedTest < Test::Unit::TestCase
     assert landmarks(:washington).changed?
     assert !landmarks(:washington).altered?
   end
+  
+  def test_should_store_changed_attributes
+    landmark = Landmark.create!(:name => 'Grand Canyon', :latitude => 36.6, :longitude => -113.6)
+    assert_equal [], landmark.versions.latest.updated_attributes
+    landmark.update_attributes(:name => 'Grand Canyon, AZ', :latitude => 1.0)
+    landmark.reload
+    assert_equal ['latitude', 'name'], landmark.versions.latest.updated_attributes.sort
+    landmark.update_attributes(:longitude => 6.66)
+    landmark.reload
+    assert_equal ['longitude'], landmark.versions.latest.updated_attributes
+  end
 end
