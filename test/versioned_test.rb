@@ -391,4 +391,34 @@ class VersionedTest < Test::Unit::TestCase
     landmark.reload
     assert_equal ['longitude'], landmark.versions.latest.updated_attributes
   end
+  
+  def test_earliest_and_latest_on_version_model
+    landmark = Landmark.create!(:name => 'Grand Canyon', :latitude => 36.6, :longitude => -113.6)
+    landmark_version = landmark.versions.latest
+    assert landmark_version.latest?
+    assert landmark_version.earliest?
+    
+    landmark.update_attribute(:name, 'Grand Canyon, AZ')
+    landmark.reload
+    landmark_latest = landmark.versions.latest
+    landmark_earliest = landmark.versions.earliest
+    assert landmark_latest.latest?
+    assert !landmark_earliest.latest?
+    assert landmark_earliest.earliest?
+    assert !landmark_earliest.latest?
+    
+    landmark.update_attribute(:name, 'Grand Canyon 2')
+    landmark.update_attribute(:name, 'Grand Canyon 3')
+    landmark.reload
+    landmark_latest = landmark.versions.latest
+    landmark_earliest = landmark.versions.earliest
+    landmark_v2 = landmark.versions[1]
+    assert landmark_latest.latest?
+    assert !landmark_earliest.latest?
+    assert landmark_earliest.earliest?
+    assert !landmark_earliest.latest?
+    assert !landmark_v2.latest?
+    assert !landmark_v2.earliest?
+  end
+  
 end

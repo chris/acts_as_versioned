@@ -254,6 +254,14 @@ module ActiveRecord #:nodoc:
             def versions_count
               page.version
             end
+            
+            def latest?
+              self.next.nil?
+            end
+            
+            def earliest?
+              self.previous.nil?
+            end
           end
 
           versioned_class.cattr_accessor :original_class
